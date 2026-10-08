@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useKeepAwake } from 'expo-keep-awake';
+import * as Updates from 'expo-updates';
 import Tree from './src/Tree';
 import { Session, loadSessions, saveSessions } from './src/storage';
 
@@ -46,6 +47,8 @@ export default function App() {
   const [minutes, setMinutes] = useState(25);
   const [now, setNow] = useState(Date.now());
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [updateMsg, setUpdateMsg] = useState('');
+  const [checking, setChecking] = useState(false);
   const startedAt = useRef(0);
   const leftAt = useRef<number | null>(null);
   const pop = useRef(new Animated.Value(1)).current;
@@ -104,6 +107,30 @@ export default function App() {
     leftAt.current = null;
     setNow(Date.now());
     setPhase('running');
+  };
+
+  const checkUpdate = async () => {
+    if (!Updates.isEnabled) {
+      setUpdateMsg('Update hanya jalan di app hasil build (APK), bukan saat development.');
+      return;
+    }
+    setChecking(true);
+    setUpdateMsg('Memeriksa update...');
+    try {
+      const res = await Updates.checkForUpdateAsync();
+      if (!res.isAvailable) {
+        setUpdateMsg('Sudah versi terbaru ✅');
+        return;
+      }
+      setUpdateMsg('Mengunduh update...');
+      await Updates.fetchUpdateAsync();
+      setUpdateMsg('Update siap, memuat ulang...');
+      await Updates.reloadAsync();
+    } catch {
+      setUpdateMsg('Gagal memeriksa update. Cek koneksi internetmu.');
+    } finally {
+      setChecking(false);
+    }
   };
 
   const giveUp = () => {
@@ -178,6 +205,19 @@ export default function App() {
           </Pressable>
         )}
 
+        {phase !== 'running' && (
+          <View style={styles.updateBox}>
+            <Pressable
+              style={[styles.updateBtn, checking && styles.updateBtnOff]}
+              onPress={checkUpdate}
+              disabled={checking}
+            >
+              <Text style={styles.updateText}>🔄 Cek update</Text>
+            </Pressable>
+            {updateMsg !== '' && <Text style={styles.updateMsg}>{updateMsg}</Text>}
+          </View>
+        )}
+
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Hutanmu</Text>
           <Text style={styles.stats}>
@@ -236,9 +276,21 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontSize: 17, fontWeight: '700' },
   btnGhost: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#c62828' },
   btnGhostText: { color: '#c62828' },
+  updateBox: { alignItems: 'center', marginTop: 20 },
+  updateBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#a5d6a7',
+    backgroundColor: '#fff',
+  },
+  updateBtnOff: { opacity: 0.5 },
+  updateText: { color: GREEN, fontWeight: '600' },
+  updateMsg: { marginTop: 6, color: '#4e6b50', fontSize: 13, textAlign: 'center' },
   card: {
     alignSelf: 'stretch',
-    marginTop: 28,
+    marginTop: 20,
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 16,
