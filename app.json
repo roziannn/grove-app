@@ -21,6 +21,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "69f42edd-10d8-4fbe-9249-041fbfbe5c1a"
+      }
+    },
+    "owner": "frosianat"
   }
 }
