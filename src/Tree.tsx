@@ -1,6 +1,7 @@
 import React from 'react';
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 import { DEFAULT_SPECIES, Species } from './species';
+import { DEFAULT_SEASON, Season } from './seasons';
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 // Bagian pohon tumbuh bertahap: fase mulai di `from`, selesai di `to`.
@@ -129,14 +130,20 @@ export function TreeGraphic({ progress, withered = false, species = DEFAULT_SPEC
   );
 }
 
-type Props = GraphicProps & { size?: number };
+type Props = GraphicProps & { size?: number; season?: Season };
 
-export default function Tree({ progress, withered = false, species = DEFAULT_SPECIES, size = 260 }: Props) {
+export default function Tree({
+  progress,
+  withered = false,
+  species = DEFAULT_SPECIES,
+  size = 260,
+  season = DEFAULT_SEASON,
+}: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 200 200">
       {/* tanah */}
-      <Ellipse cx={100} cy={BASE_Y + 8} rx={62} ry={11} fill={withered ? '#8d7f6a' : '#6d4c2f'} />
-      <Ellipse cx={100} cy={BASE_Y + 5} rx={56} ry={9} fill={withered ? '#a39577' : '#8a6a3f'} />
+      <Ellipse cx={100} cy={BASE_Y + 8} rx={62} ry={11} fill={withered ? '#8d7f6a' : season.sideL} />
+      <Ellipse cx={100} cy={BASE_Y + 5} rx={56} ry={9} fill={withered ? '#a39577' : season.mound} />
       <TreeGraphic progress={progress} withered={withered} species={species} />
     </Svg>
   );

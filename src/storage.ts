@@ -12,9 +12,10 @@ export type Session = {
 export type Profile = {
   unlocked: string[]; // id jenis pohon yang sudah dibeli
   selected: string; // jenis pohon yang dipakai
+  season: string; // musim tanah hutan
 };
 
-export const DEFAULT_PROFILE: Profile = { unlocked: ['oak'], selected: 'oak' };
+export const DEFAULT_PROFILE: Profile = { unlocked: ['oak'], selected: 'oak', season: 'summer' };
 
 const SESSIONS_KEY = 'grove:sessions';
 const PROFILE_KEY = 'grove:profile';
@@ -38,5 +39,9 @@ async function write(key: string, value: unknown): Promise<void> {
 
 export const loadSessions = () => read<Session[]>(SESSIONS_KEY, []);
 export const saveSessions = (list: Session[]) => write(SESSIONS_KEY, list);
-export const loadProfile = () => read<Profile>(PROFILE_KEY, DEFAULT_PROFILE);
+// Digabung dengan nilai bawaan supaya profil lama (tanpa field baru) tetap valid.
+export const loadProfile = async (): Promise<Profile> => ({
+  ...DEFAULT_PROFILE,
+  ...(await read<Partial<Profile>>(PROFILE_KEY, {})),
+});
 export const saveProfile = (p: Profile) => write(PROFILE_KEY, p);
