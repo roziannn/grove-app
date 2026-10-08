@@ -34,3 +34,23 @@ eas build -p android --profile preview
 
 Build jalan di server Expo (gratis untuk pemakaian dasar). Setelah selesai, buka link
 unduhan di HP, pasang file `.apk`, dan izinkan "Install dari sumber tidak dikenal" bila diminta.
+
+## Update tanpa pasang APK baru (EAS Update)
+
+Perubahan JavaScript (tampilan, teks, logika timer, bentuk pohon) bisa dikirim lewat udara.
+Setup sekali saja:
+
+```bash
+npx eas-cli update:configure
+npx eas-cli build -p android --profile preview   # pasang APK ini satu kali
+```
+
+Setiap ada perubahan berikutnya:
+
+```bash
+git pull
+npx eas-cli update --channel preview --message "deskripsi singkat"
+```
+
+Tutup lalu buka app dua kali di HP: yang pertama mengunduh, yang kedua memakai versi baru.
+Perubahan yang menambah paket native atau izin tetap butuh build APK baru.
