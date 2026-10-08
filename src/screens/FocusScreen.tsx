@@ -6,6 +6,7 @@ import Tree from '../Tree';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { TAGS, getSpecies } from '../species';
+import { getSeason } from '../seasons';
 import type { Profile, Session } from '../storage';
 
 type Phase = 'idle' | 'running' | 'success' | 'failed';
@@ -57,6 +58,7 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
   const pop = useRef(new Animated.Value(1)).current;
 
   const species = getSpecies(profile.selected);
+  const season = getSeason(profile.season);
   const durationMs = minutes * 60_000;
 
   useEffect(() => {
@@ -171,8 +173,8 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
               : 'Pilih kegiatan dan durasi, lalu tanam pohon'}
       </Text>
 
-      <Animated.View style={[styles.stage, { transform: [{ scale: pop }] }]}>
-        <Tree progress={progress} withered={phase === 'failed'} species={species} />
+      <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
+        <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} />
       </Animated.View>
 
       {phase === 'running' && (

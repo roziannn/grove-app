@@ -21,7 +21,7 @@ export default function CollectionScreen({ active, profile, coins, onChange }: P
     }
     Alert.alert(`Beli ${name}?`, `${price} koin akan terpakai.`, [
       { text: 'Batal', style: 'cancel' },
-      { text: 'Beli', onPress: () => onChange({ unlocked: [...profile.unlocked, id], selected: id }) },
+      { text: 'Beli', onPress: () => onChange({ ...profile, unlocked: [...profile.unlocked, id], selected: id }) },
     ]);
   };
 

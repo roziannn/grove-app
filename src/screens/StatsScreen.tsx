@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import IsoForest, { FOREST_CAPACITY } from '../IsoForest';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
+import { SEASONS, getSeason } from '../seasons';
 import { Range, bucketMinutes, fmtDuration, getPeriod, inPeriod, tagTotals } from '../stats';
 import type { Session } from '../storage';
 
@@ -15,7 +16,14 @@ const RANGES: { key: Range; label: string }[] = [
 
 const CHART_H = 120;
 
-export default function StatsScreen({ active, sessions }: { active: boolean; sessions: Session[] }) {
+type Props = {
+  active: boolean;
+  sessions: Session[];
+  season: string;
+  onSeasonChange: (id: string) => void;
+};
+
+export default function StatsScreen({ active, sessions, season, onSeasonChange }: Props) {
   const [range, setRange] = useState<Range>('day');
   const [offset, setOffset] = useState(0);
 
@@ -56,7 +64,21 @@ export default function StatsScreen({ active, sessions }: { active: boolean; ses
         </Pressable>
       </View>
 
-      <IsoForest sessions={inRange} />
+      <IsoForest sessions={inRange} season={getSeason(season)} />
+
+      <View style={styles.seasons}>
+        {SEASONS.map((sn) => (
+          <Pressable
+            key={sn.id}
+            onPress={() => onSeasonChange(sn.id)}
+            style={[styles.season, season === sn.id && styles.seasonOn]}
+            accessibilityLabel={`Musim ${sn.name}`}
+          >
+            <Text style={styles.seasonIcon}>{sn.icon}</Text>
+            <Text style={[styles.seasonText, season === sn.id && styles.seasonTextOn]}>{sn.name}</Text>
+          </Pressable>
+        ))}
+      </View>
       {inRange.length > FOREST_CAPACITY && (
         <Text style={styles.more}>+{inRange.length - FOREST_CAPACITY} pohon lagi tidak muat di petak</Text>
       )}
@@ -139,6 +161,20 @@ const styles = StyleSheet.create({
   navLabel: { fontSize: 17, fontWeight: '700', color: GREEN_DARK },
   arrow: { fontSize: 32, color: GREEN, paddingHorizontal: 8, lineHeight: 34 },
   arrowOff: { opacity: 0.25 },
+  seasons: { flexDirection: 'row', gap: 8, marginTop: 6 },
+  season: {
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  seasonOn: { backgroundColor: GREEN, borderColor: GREEN },
+  seasonIcon: { fontSize: 18 },
+  seasonText: { fontSize: 11, fontWeight: '600', color: GREEN },
+  seasonTextOn: { color: '#fff' },
   more: { color: TEXT_SOFT, fontSize: 12, marginTop: 4 },
   summary: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'stretch', marginTop: 12 },
   total: { fontSize: 22, fontWeight: '800', color: GREEN_DARK },

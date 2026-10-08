@@ -62,7 +62,12 @@ export default function App() {
         onFinished={addSession}
         onRunningChange={setRunning}
       />
-      <StatsScreen active={tab === 'stats'} sessions={sessions} />
+      <StatsScreen
+        active={tab === 'stats'}
+        sessions={sessions}
+        season={profile.season}
+        onSeasonChange={(season) => changeProfile({ ...profile, season })}
+      />
       <CollectionScreen active={tab === 'collection'} profile={profile} coins={coins} onChange={changeProfile} />
       {!running && <TabBar active={tab} onChange={setTab} />}
     </SafeAreaView>
