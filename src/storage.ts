@@ -7,7 +7,7 @@ export type Session = {
   ok: boolean; // true = pohon tumbuh, false = layu
 };
 
-const KEY = 'focus-forest:sessions';
+const KEY = 'grove:sessions';
 
 export async function loadSessions(): Promise<Session[]> {
   try {

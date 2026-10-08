@@ -127,7 +127,7 @@ export default function App() {
       <StatusBar style="dark" />
       {phase === 'running' && <RunningKeepAwake />}
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>🌱 Focus Forest</Text>
+        <Text style={styles.title}>🌱 Grove</Text>
         <Text style={styles.subtitle}>
           {phase === 'running'
             ? 'Tetap di app ini, pohonmu sedang tumbuh'

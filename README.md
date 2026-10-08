@@ -1,4 +1,4 @@
-# Focus Forest
+# Grove
 
 Timer belajar ala Forest: pilih durasi, tanam pohon, dan pohon tumbuh selama kamu fokus.
 Kalau menyerah atau meninggalkan app lebih dari 10 detik, pohon layu.
@@ -8,7 +8,7 @@ Kalau menyerah atau meninggalkan app lebih dari 10 detik, pohon layu.
 1. Pasang **Expo Go** dari Play Store.
 2. Di laptop:
    ```bash
-   cd focus-forest
+   cd grove
    npm install
    npx expo start
    ```
