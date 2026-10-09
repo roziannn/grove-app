@@ -10,7 +10,7 @@ import ProgressRing from '../ProgressRing';
 import type { DailyView } from '../daily';
 import { Screen } from '../ui';
 import { GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
-import { TAGS, TAG_ICONS, getSpecies, tagLabel } from '../species';
+import { TAGS, TAG_ICONS, getSpecies, ringColor, tagLabel } from '../species';
 import { getSeason } from '../seasons';
 import type { Profile, Session } from '../storage';
 
@@ -228,7 +228,7 @@ export default function FocusScreen({
             <ProgressRing
               diameter={STAGE_TREE + 12}
               progress={progress}
-              color={species.mid}
+              color={ringColor(species)}
               showHead={phase === 'running'}
             />
           )}

@@ -66,6 +66,34 @@ export function TreeGraphic({ progress, withered = false, species = DEFAULT_SPEC
         </G>
       );
     }
+    if (head === 'tulip') {
+      // tiga kelopak runcing membentuk cawan: dua di belakang (lebih gelap) dan satu di depan
+      const petal = (w: number, tilt: number, fill: string, k: string) => (
+        <Path
+          key={k}
+          d={`M${x - w * s} ${y} C${x - (w + 2) * s} ${y - 14 * s} ${x - 3 * s} ${y - 24 * s} ${x} ${y - 28 * s}
+              C${x + 3 * s} ${y - 24 * s} ${x + (w + 2) * s} ${y - 14 * s} ${x + w * s} ${y}
+              Q${x} ${y + 7 * s} ${x - w * s} ${y} Z`}
+          fill={fill}
+          transform={`rotate(${tilt} ${x} ${y})`}
+        />
+      );
+      return (
+        <G key={key}>
+          {petal(6, -24, center, 'l')}
+          {petal(6, 24, center, 'r')}
+          {petal(7.5, 0, bloom, 'f')}
+          <Path
+            d={`M${x - 3.5 * s} ${y - 3 * s} C${x - 5.5 * s} ${y - 12 * s} ${x - 2.5 * s} ${y - 19 * s} ${x - 1 * s} ${y - 23 * s}`}
+            stroke="#ffffff"
+            strokeOpacity={withered ? 0 : 0.45}
+            strokeWidth={2.2 * s}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </G>
+      );
+    }
     if (head === 'glow') {
       return (
         <G key={key}>

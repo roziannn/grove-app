@@ -1,5 +1,5 @@
 export type Kind = 'round' | 'cone' | 'cactus' | 'reed' | 'flower' | 'bush' | 'fern' | 'lotus';
-export type Head = 'bell' | 'trumpet' | 'star' | 'glow';
+export type Head = 'bell' | 'trumpet' | 'star' | 'glow' | 'tulip';
 
 export type Species = {
   id: string;
@@ -15,6 +15,7 @@ export type Species = {
   head?: Head; // bentuk kepala bunga (kind 'flower')
   dots?: string[]; // buah/bunga kecil di tajuk pohon (kind 'round')
   glow?: string; // warna cahaya lembut; bawaan: warna bunga/daun
+  ring?: string; // warna cincin progres; bawaan: warna bunga (tanaman berbunga) atau warna daun
 };
 
 export const SPECIES: Species[] = [
@@ -36,7 +37,7 @@ export const SPECIES: Species[] = [
   },
   { id: 'maple', name: 'Maple', price: 80, kind: 'round', dark: '#e65100', mid: '#fb8c00', light: '#ffb74d', trunk: '#795548' },
   {
-    id: 'snowdrop', name: 'Snowdrop', price: 90, kind: 'flower', head: 'bell', glow: '#90caf9',
+    id: 'snowdrop', name: 'Snowdrop', price: 90, kind: 'flower', head: 'bell', glow: '#90caf9', ring: '#6aa9e0',
     dark: '#2e7d32', mid: '#66bb6a', light: '#a5d6a7', trunk: '#2e7d32', bloom: '#ffffff', center: '#aed581',
   },
   {
@@ -68,6 +69,10 @@ export const SPECIES: Species[] = [
     dots: ['#fffde7', '#fff59d', '#fffde7', '#ffe082', '#fffde7', '#fff59d', '#fffde7'],
   },
   {
+    id: 'bluetulip', name: 'Tulip Biru', price: 130, kind: 'flower', head: 'tulip',
+    dark: '#2e7d32', mid: '#43a047', light: '#bcd4ff', trunk: '#2e7d32', bloom: '#4f86ff', center: '#2c4fc7', glow: '#5c9dff',
+  },
+  {
     id: 'lotus', name: 'Teratai', price: 150, kind: 'lotus',
     dark: '#2e7d32', mid: '#43a047', light: '#f8bbd0', trunk: '#2e7d32', bloom: '#f48fb1', center: '#ffd54f',
   },
@@ -78,6 +83,10 @@ export const SPECIES: Species[] = [
 ];
 
 export const DEFAULT_SPECIES = SPECIES[0];
+
+// Warna cincin progres di layar Fokus: tanaman berbunga memakai warna bunganya, sisanya warna daun.
+export const ringColor = (sp: Species): string =>
+  sp.ring ?? (['flower', 'bush', 'lotus', 'reed'].includes(sp.kind) ? (sp.bloom ?? sp.mid) : sp.mid);
 
 // Warna cahaya lembut di belakang tanaman.
 export const glowColor = (sp: Species): string =>
