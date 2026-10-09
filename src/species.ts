@@ -86,15 +86,20 @@ export const glowColor = (sp: Species): string =>
 export const getSpecies = (id?: string): Species =>
   SPECIES.find((s) => s.id === id) ?? DEFAULT_SPECIES;
 
-export const TAGS = ['Belajar', 'Membaca', 'Kerja', 'Proyek', 'Lainnya'];
+// Urutan di daftar pilihan kegiatan. Kunci "Belajar" tetap dipakai agar riwayat lama tidak rusak.
+export const TAGS = ['Belajar', 'Kerja', 'Proyek', 'Membaca', 'Lainnya'];
 
 export const TAG_ICONS: Record<string, string> = {
-  Belajar: '📚',
-  Membaca: '📖',
+  Belajar: '💻',
   Kerja: '💼',
   Proyek: '🛠️',
+  Membaca: '📖',
   Lainnya: '✨',
 };
+
+// Nama yang ditampilkan ke pengguna (bisa beda dari kunci yang disimpan).
+export const TAG_LABELS: Record<string, string> = { Belajar: 'Belajar ngoding' };
+export const tagLabel = (tag: string) => TAG_LABELS[tag] ?? tag;
 
 // Warna tetap per label supaya konsisten di semua diagram.
 export const TAG_COLORS: Record<string, string> = {

@@ -136,7 +136,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   // Kegiatan
   { id: 'tags_3', group: 'Kegiatan', icon: '🏷️', name: 'Serba Bisa', desc: 'Pakai 3 label kegiatan berbeda', target: 3, value: (s) => s.tagsUsed },
-  { id: 'belajar_10', group: 'Kegiatan', icon: '📖', name: 'Rajin Belajar', desc: 'Tanam 10 pohon berlabel Belajar', target: 10, value: (s) => s.belajar },
+  { id: 'belajar_10', group: 'Kegiatan', icon: '📖', name: 'Rajin Belajar', desc: 'Tanam 10 pohon berlabel Belajar ngoding', target: 10, value: (s) => s.belajar },
   { id: 'tags_all', group: 'Kegiatan', icon: '🎯', name: 'Semua Kegiatan', desc: 'Pakai semua label kegiatan', target: TAGS.length, value: (s) => s.tagsUsed },
 
   // Koleksi
