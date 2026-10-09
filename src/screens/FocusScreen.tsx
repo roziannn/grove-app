@@ -6,6 +6,7 @@ import Tree from '../Tree';
 import DailyRewardModal from '../DailyRewardModal';
 import ActivityPicker from '../ActivityPicker';
 import DurationPicker, { DEFAULT_MINUTES } from '../DurationPicker';
+import ProgressRing from '../ProgressRing';
 import type { DailyView } from '../daily';
 import { Screen } from '../ui';
 import { GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
@@ -14,6 +15,9 @@ import { getSeason } from '../seasons';
 import type { Profile, Session } from '../storage';
 
 type Phase = 'idle' | 'running' | 'success' | 'failed';
+
+// Ukuran pohon di dalam lingkaran (lingkaran = ini + padding 6 di tiap sisi).
+const STAGE_TREE = 220;
 
 // Boleh keluar app sebentar (mis. lihat notifikasi) sebelum pohon layu.
 const GRACE_MS = 10_000;
@@ -208,7 +212,15 @@ export default function FocusScreen({
         </Text>
 
         <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
-          <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} size={220} glow />
+          <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} size={STAGE_TREE} glow />
+          {(phase === 'running' || phase === 'success') && (
+            <ProgressRing
+              diameter={STAGE_TREE + 12}
+              progress={progress}
+              color={species.mid}
+              showHead={phase === 'running'}
+            />
+          )}
         </Animated.View>
 
         {phase === 'running' && (
@@ -294,7 +306,7 @@ const styles = StyleSheet.create({
   chevron: { fontSize: 30, color: TEXT_SOFT, lineHeight: 32, paddingHorizontal: 6 },
   center: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
   subtitle: { fontSize: 14, color: TEXT_SOFT, textAlign: 'center', minHeight: 20 },
-  stage: { marginVertical: 12, backgroundColor: '#f1f8e9', borderRadius: 140, padding: 6 },
+  stage: { marginVertical: 20, backgroundColor: '#f1f8e9', borderRadius: 140, padding: 6 },
   timer: { fontSize: 52, fontWeight: '700', color: GREEN_DARK },
   btn: { marginTop: 18, backgroundColor: GREEN, paddingHorizontal: 40, paddingVertical: 14, borderRadius: 28 },
   btnText: { color: '#fff', fontSize: 17, fontWeight: '800' },
