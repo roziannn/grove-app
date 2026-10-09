@@ -21,7 +21,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 
 - **Fokus**: pilih kegiatan (Belajar, Membaca, Kerja, ...) dan durasi, lalu tanam pohon.
 - **Statistik**: Hari / Minggu / Bulan / Tahun dengan hutan isometrik, grafik waktu fokus, rincian per kegiatan, dan diagram donat distribusi kegiatan.
-- **Koleksi**: 1 menit fokus berhasil = 1 koin. Tukar koin dengan jenis pohon baru (Pinus, Kaktus, Sakura, Maple).
+- **Koleksi**: 1 menit fokus berhasil = 1 koin. Tukar koin dengan 16 jenis pohon dan tanaman (Pinus, Kaktus, Sakura, Teratai, Jacaranda, Bunga Harapan, dll.).
 - **Musim tanah hutan**: ☀️ Panas, 🌸 Semi, 🍂 Gugur, ❄️ Dingin (pilih di tab Statistik; ikut mengubah latar di layar Fokus).
 - **Streak** hari berturut-turut, tombol **Cek update**, dan menu melayang di bawah.
 
