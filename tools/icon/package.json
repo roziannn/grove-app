@@ -1,0 +1,13 @@
+{
+  "name": "grove-icon-generator",
+  "private": true,
+  "type": "module",
+  "description": "Merender pohon 3D dengan three.js lalu menyimpannya sebagai aset ikon aplikasi (../../assets).",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.56.1",
+    "three": "0.170.0"
+  }
+}
