@@ -100,6 +100,8 @@ export default function App() {
       achVersion: 1,
       achievements: { ...profile.achievements, ...Object.fromEntries(fresh.map((a) => [a.id, at])) },
     };
+    // Sengaja: prestasi diturunkan dari data yang baru dimuat/berubah, bukan dari satu event tertentu.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setProfile(next);
     saveProfile(next);
     if (!silent) setToasts((q) => [...q, ...fresh.map((a) => a.id)]);

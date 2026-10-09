@@ -88,6 +88,14 @@ export const getSpecies = (id?: string): Species =>
 
 export const TAGS = ['Belajar', 'Membaca', 'Kerja', 'Proyek', 'Lainnya'];
 
+export const TAG_ICONS: Record<string, string> = {
+  Belajar: '📚',
+  Membaca: '📖',
+  Kerja: '💼',
+  Proyek: '🛠️',
+  Lainnya: '✨',
+};
+
 // Warna tetap per label supaya konsisten di semua diagram.
 export const TAG_COLORS: Record<string, string> = {
   Belajar: '#43a047',

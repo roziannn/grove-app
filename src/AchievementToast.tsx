@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import AchievementBadge from './AchievementBadge';
 import { Achievement, GROUP_COLORS } from './achievements';
@@ -6,7 +6,7 @@ import { GREEN_DARK } from './theme';
 
 // Banner yang meluncur dari atas saat prestasi baru terbuka. Hilang sendiri setelah beberapa detik.
 export default function AchievementToast({ achievement, onDone }: { achievement: Achievement; onDone: () => void }) {
-  const y = useRef(new Animated.Value(-160)).current;
+  const [y] = useState(() => new Animated.Value(-160));
   const color = GROUP_COLORS[achievement.group];
 
   useEffect(() => {
