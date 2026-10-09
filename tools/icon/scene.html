@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Grove icon</title>
+    <script type="importmap">
+      { "imports": { "three": "./node_modules/three/build/three.module.js" } }
+    </script>
+  </head>
+  <body style="margin:0;background:transparent">
+    <script type="module">
+      import * as THREE from 'three';
+
+      const R = 2048; // render besar lalu diperkecil agar tepinya halus
+
+      // Membangun pohon: bukit rumput, batang bercabang, tajuk dari bola-bola hijau, buah kecil.
+      // mono = true menghasilkan siluet putih polos (untuk ikon monokrom Android).
+      function buildTree(mono) {
+        const g = new THREE.Group();
+        const mat = (color, rough = 0.55) =>
+          mono
+            ? new THREE.MeshBasicMaterial({ color: 0xffffff })
+            : new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0 });
+        const add = (geo, m, x, y, z, s = [1, 1, 1], cast = true) => {
+          const mesh = new THREE.Mesh(geo, m);
+          mesh.position.set(x, y, z);
+          mesh.scale.set(...s);
+          mesh.castShadow = cast;
+          mesh.receiveShadow = true;
+          g.add(mesh);
+          return mesh;
+        };
+        const ball = (r) => new THREE.SphereGeometry(r, 96, 64);
+
+        // bukit rumput membulat + tepi tanah
+        add(ball(2.0), mat('#6d4c2f', 0.9), 0, -0.1, 0, [1, 0.3, 1], false);
+        add(ball(2.0), mat('#8ed36f', 0.7), 0, 0.04, 0, [1, 0.3, 1]);
+
+        // batang dan dua cabang
+        const trunkMat = mat('#8b5a2b', 0.8);
+        add(new THREE.CylinderGeometry(0.17, 0.3, 1.7, 40), trunkMat, 0, 0.9, 0);
+        const branch = (x, rz) => {
+          const m = add(new THREE.CylinderGeometry(0.07, 0.12, 0.85, 24), trunkMat, x, 1.55, 0);
+          m.rotation.z = rz;
+        };
+        branch(-0.34, 0.62);
+        branch(0.34, -0.62);
+
+        // tajuk: gumpalan bola hijau, makin ke atas makin terang
+        add(ball(1.15), mat('#2e7d32'), 0, 2.45, 0);
+        add(ball(0.88), mat('#3d9a42'), -1.0, 2.0, 0.25);
+        add(ball(0.88), mat('#3d9a42'), 1.0, 2.0, 0.1);
+        add(ball(0.78), mat('#4caf50'), -0.55, 3.05, 0.2);
+        add(ball(0.74), mat('#58b65c'), 0.6, 3.05, 0.1);
+        add(ball(0.52), mat('#6cc070'), 0.0, 3.45, 0.3);
+
+        // buah kecil seperti pada pohon di app, diletakkan di permukaan bola yang menghadap kamera
+        const fruit = (c, cx, cy, cz, r, dx, dy, dz, size = 0.12) => {
+          const n = new THREE.Vector3(dx, dy, dz).normalize().multiplyScalar(r + 0.02);
+          add(ball(size), mat(c, 0.35), cx + n.x, cy + n.y, cz + n.z, [1, 1, 1], false);
+        };
+        fruit('#ef5350', -1.0, 2.0, 0.25, 0.88, -0.35, 0.05, 1);
+        fruit('#ef5350', 1.0, 2.0, 0.1, 0.88, 0.45, -0.1, 1);
+        fruit('#ef5350', 0, 2.45, 0, 1.15, -0.1, -0.35, 1);
+        fruit('#ffca28', -0.55, 3.05, 0.2, 0.78, -0.2, 0.15, 1, 0.11);
+        fruit('#ffca28', 0.6, 3.05, 0.1, 0.74, 0.3, 0.05, 1, 0.11);
+
+        g.rotation.y = -0.35;
+        return g;
+      }
+
+      function renderTree(mono) {
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+        renderer.setPixelRatio(1);
+        renderer.setSize(R, R);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.shadowMap.enabled = !mono;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        const scene = new THREE.Scene();
+        scene.add(buildTree(mono));
+        if (!mono) {
+          scene.add(new THREE.HemisphereLight(0xffffff, 0x9bc79a, 1.15));
+          const sun = new THREE.DirectionalLight(0xfff4e0, 2.6);
+          sun.position.set(-3.5, 7, 6);
+          sun.castShadow = true;
+          sun.shadow.mapSize.set(2048, 2048);
+          sun.shadow.radius = 6;
+          sun.shadow.camera.left = -4;
+          sun.shadow.camera.right = 4;
+          sun.shadow.camera.top = 5;
+          sun.shadow.camera.bottom = -3;
+          scene.add(sun);
+        }
+
+        const cam = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+        cam.position.set(0, 4.6, 11.5);
+        cam.lookAt(0, 1.8, 0);
+        renderer.render(scene, cam);
+
+        const c = document.createElement('canvas');
+        c.width = c.height = R;
+        c.getContext('2d').drawImage(renderer.domElement, 0, 0);
+        renderer.dispose();
+        return c;
+      }
+
+      // Potong ke bagian yang terisi supaya mudah dipasang dengan ukuran tertentu.
+      function crop(canvas) {
+        const ctx = canvas.getContext('2d');
+        const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let x0 = width, y0 = height, x1 = 0, y1 = 0;
+        for (let y = 0; y < height; y++)
+          for (let x = 0; x < width; x++)
+            if (data[(y * width + x) * 4 + 3] > 8) {
+              if (x < x0) x0 = x;
+              if (x > x1) x1 = x;
+              if (y < y0) y0 = y;
+              if (y > y1) y1 = y;
+            }
+        const out = document.createElement('canvas');
+        out.width = x1 - x0 + 1;
+        out.height = y1 - y0 + 1;
+        out.getContext('2d').drawImage(canvas, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+        return out;
+      }
+
+      function gradientBackground(size) {
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const ctx = c.getContext('2d');
+        const lg = ctx.createLinearGradient(0, 0, size, size);
+        lg.addColorStop(0, '#d6f3d1');
+        lg.addColorStop(1, '#86d08f');
+        ctx.fillStyle = lg;
+        ctx.fillRect(0, 0, size, size);
+        return c;
+      }
+
+      function sparkle(ctx, x, y, r, color, alpha) {
+        const k = r * 0.28;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, y - r);
+        ctx.lineTo(x + k, y - k);
+        ctx.lineTo(x + r, y);
+        ctx.lineTo(x + k, y + k);
+        ctx.lineTo(x, y + r);
+        ctx.lineTo(x - k, y + k);
+        ctx.lineTo(x - r, y);
+        ctx.lineTo(x - k, y - k);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // opts: size, bg ('gradient' | 'none'), fit (lebar maksimum pohon relatif ukuran kanvas),
+      // glow, sparkles, mono
+      function compose(tree, opts) {
+        const { size, bg = 'none', fit = 0.7, glow = true, sparkles = true } = opts;
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const ctx = c.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+
+        if (bg === 'gradient') ctx.drawImage(gradientBackground(size), 0, 0);
+
+        // kotak tempat pohon berada
+        const box = size * fit;
+        const s = Math.min(box / tree.width, box / tree.height);
+        const w = tree.width * s;
+        const h = tree.height * s;
+        const cx = size / 2;
+        const cy = size * 0.52;
+
+        if (glow) {
+          const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, box * 0.72);
+          rg.addColorStop(0, 'rgba(255,255,255,0.85)');
+          rg.addColorStop(0.55, 'rgba(255,255,255,0.28)');
+          rg.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = rg;
+          ctx.fillRect(0, 0, size, size);
+        }
+
+        ctx.drawImage(tree, cx - w / 2, cy - h / 2, w, h);
+
+        if (sparkles) {
+          const u = size * fit;
+          sparkle(ctx, cx - u * 0.52, cy - u * 0.42, u * 0.07, '#ffffff', 0.95);
+          sparkle(ctx, cx + u * 0.5, cy - u * 0.5, u * 0.05, '#fff7c2', 0.95);
+          sparkle(ctx, cx + u * 0.52, cy + u * 0.12, u * 0.04, '#ffffff', 0.9);
+          sparkle(ctx, cx - u * 0.5, cy + u * 0.18, u * 0.035, '#fff7c2', 0.9);
+        }
+        return c;
+      }
+
+      window.buildAssets = () => {
+        const color = crop(renderTree(false));
+        const mono = crop(renderTree(true));
+        const url = (c) => c.toDataURL('image/png');
+        const out = {};
+        // ikon utama (iOS/umum): opak, tanpa transparansi
+        out['icon.png'] = url(compose(color, { size: 1024, bg: 'gradient', fit: 0.74 }));
+        // adaptive icon Android: konten harus di zona aman (sekitar 66% bagian tengah)
+        out['android-icon-background.png'] = url(gradientBackground(512));
+        out['android-icon-foreground.png'] = url(compose(color, { size: 1024, fit: 0.54 }));
+        out['android-icon-monochrome.png'] = url(compose(mono, { size: 1024, fit: 0.54, glow: false, sparkles: false }));
+        out['splash-icon.png'] = url(compose(color, { size: 512, fit: 0.8 }));
+        const fav = document.createElement('canvas');
+        fav.width = fav.height = 64;
+        const fctx = fav.getContext('2d');
+        fctx.imageSmoothingQuality = 'high';
+        fctx.drawImage(compose(color, { size: 1024, bg: 'gradient', fit: 0.86, glow: false, sparkles: false }), 0, 0, 64, 64);
+        out['favicon.png'] = url(fav);
+        return out;
+      };
+      window.__ready = true;
+    </script>
+  </body>
+</html>

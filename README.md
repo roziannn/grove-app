@@ -71,3 +71,26 @@ npx eas-cli update --channel preview --message "deskripsi singkat"
 
 Tutup lalu buka app dua kali di HP: yang pertama mengunduh, yang kedua memakai versi baru.
 Perubahan yang menambah paket native atau izin tetap butuh build APK baru.
+
+## Ikon aplikasi (pohon 3D dari three.js)
+
+Ikon di `assets/` dibuat dari model pohon 3D yang dirender dengan three.js. Untuk membuatnya ulang:
+
+```bash
+cd tools/icon
+npm install
+npx playwright install chromium   # sekali saja, kalau belum punya Chromium
+npm run generate
+```
+
+Skrip ini menulis ulang `icon.png`, `android-icon-*.png`, `splash-icon.png`, dan `favicon.png`. Bentuk pohon, warna, dan latar ada di `tools/icon/scene.html`.
+
+Ikon launcher tertanam di APK, jadi perubahan ikon baru terlihat setelah build APK baru
+(`npx eas-cli build -p android --profile preview`), bukan lewat `eas update`.
+
+## Performa dan ukuran
+
+- Layar selain Fokus baru dipasang saat pertama dibuka, dan animasi ikon prestasi berhenti saat layarnya tidak terlihat.
+- Timer sesi panjang (> 10 menit) memperbarui tampilan sekali per detik; sesi pendek 4x per detik agar cincin progres mulus.
+- Build Android: hanya arm64, R8 minify, shrink resources, dan pustaka native dikompres (`app.json`, plugin `expo-build-properties`).
+- Untuk Play Store, pakai profil `production` (.aab): unduhan pengguna biasanya lebih kecil daripada APK.

@@ -14,7 +14,7 @@ type Props = {
 
 const GROUPS: Group[] = ['Menanam', 'Waktu Fokus', 'Konsisten', 'Kebiasaan', 'Kegiatan', 'Koleksi', 'Spesial'];
 
-function Row({ a, index, stats, at }: { a: Achievement; index: number; stats: Stats; at?: number }) {
+function Row({ a, index, stats, at, paused }: { a: Achievement; index: number; stats: Stats; at?: number; paused: boolean }) {
   const color = GROUP_COLORS[a.group];
   const done = isDone(a, stats);
   const value = Math.min(a.value(stats), a.target);
@@ -23,7 +23,7 @@ function Row({ a, index, stats, at }: { a: Achievement; index: number; stats: St
 
   return (
     <View style={[styles.row, done && { backgroundColor: `${color}1A`, borderColor: `${color}66` }]}>
-      <AchievementBadge icon={a.icon} color={color} unlocked={done} seed={index} />
+      <AchievementBadge icon={a.icon} color={color} unlocked={done} seed={index} paused={paused} />
       <View style={styles.info}>
         <Text style={[styles.name, !done && styles.nameLocked]}>{a.name}</Text>
         <Text style={styles.desc}>{a.desc}</Text>
@@ -77,7 +77,7 @@ export default function AchievementsScreen({ active, stats, unlockedAt }: Props)
               </Text>
             </View>
             {items.map((a) => (
-              <Row key={a.id} a={a} index={ACHIEVEMENTS.indexOf(a)} stats={stats} at={unlockedAt[a.id]} />
+              <Row key={a.id} a={a} index={ACHIEVEMENTS.indexOf(a)} stats={stats} at={unlockedAt[a.id]} paused={!active} />
             ))}
           </View>
         );

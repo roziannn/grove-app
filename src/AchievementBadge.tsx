@@ -7,17 +7,19 @@ type Props = {
   unlocked: boolean;
   size?: number;
   seed?: number; // menentukan gaya animasi supaya tiap ikon tidak seragam
+  paused?: boolean; // true = layar tidak terlihat, jangan menjalankan animasi (hemat baterai)
 };
 
 // Ikon prestasi. Yang sudah terbuka bergerak pelan dan bercahaya; yang terkunci diam dan pudar.
 // Ketuk untuk memantulkan ikon.
-export default function AchievementBadge({ icon, color, unlocked, size = 56, seed = 0 }: Props) {
+export default function AchievementBadge({ icon, color, unlocked, size = 56, seed = 0, paused = false }: Props) {
   const [loop] = useState(() => new Animated.Value(0));
   const [bounce] = useState(() => new Animated.Value(1));
   const variant = seed % 4;
+  const animate = unlocked && !paused;
 
   useEffect(() => {
-    if (!unlocked) return;
+    if (!animate) return;
     const dur = 1300 + (seed % 5) * 170;
     const anim = Animated.loop(
       Animated.sequence([
@@ -26,8 +28,11 @@ export default function AchievementBadge({ icon, color, unlocked, size = 56, see
       ]),
     );
     anim.start();
-    return () => anim.stop();
-  }, [unlocked, seed, loop]);
+    return () => {
+      anim.stop();
+      loop.setValue(0);
+    };
+  }, [animate, seed, loop]);
 
   const pop = () => {
     bounce.setValue(0.7);
