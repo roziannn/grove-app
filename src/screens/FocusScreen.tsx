@@ -16,6 +16,9 @@ import type { Profile, Session } from '../storage';
 
 type Phase = 'idle' | 'running' | 'success' | 'failed';
 
+// Sesi sampai batas ini diperbarui lebih sering (4x/detik) supaya cincin progres tetap mulus.
+const SHORT_SESSION_MS = 10 * 60_000;
+
 // Ukuran pohon di dalam lingkaran (lingkaran = ini + padding 6 di tiap sisi).
 const STAGE_TREE = 220;
 
@@ -93,14 +96,22 @@ export default function FocusScreen({
   );
 
   // Ticker: hitung dari timestamp supaya tetap akurat walau app sempat di-background.
+  // Sesi pendek diperbarui 4x/detik agar cincin mulus; sesi panjang cukup sekali per detik
+  // (selaras dengan pergantian angka timer), jadi render ulang 4x lebih sedikit.
   useEffect(() => {
     if (phase !== 'running') return;
-    const id = setInterval(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const step = () => {
       const t = Date.now();
       setNow(t);
-      if (t - startedAt >= durationMs) finish(true);
-    }, 200);
-    return () => clearInterval(id);
+      if (t - startedAt >= durationMs) {
+        finish(true);
+        return;
+      }
+      timer = setTimeout(step, durationMs <= SHORT_SESSION_MS ? 250 : 1000 - ((t - startedAt) % 1000) + 10);
+    };
+    timer = setTimeout(step, 250);
+    return () => clearTimeout(timer);
   }, [phase, durationMs, startedAt, finish]);
 
   // Keluar dari app terlalu lama = pohon layu.

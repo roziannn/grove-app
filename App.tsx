@@ -24,6 +24,12 @@ import {
 
 export default function App() {
   const [tab, setTab] = useState<TabKey>('focus');
+  // Layar selain Fokus baru dipasang saat pertama kali dibuka: startup lebih cepat dan memori lebih hemat.
+  const [visited, setVisited] = useState<Set<TabKey>>(() => new Set<TabKey>(['focus']));
+  const goTab = useCallback((k: TabKey) => {
+    setTab(k);
+    setVisited((v) => (v.has(k) ? v : new Set(v).add(k)));
+  }, []);
   const [running, setRunning] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
@@ -124,18 +130,24 @@ export default function App() {
         onFinished={addSession}
         onRunningChange={setRunning}
       />
-      <StatsScreen
-        active={tab === 'stats'}
-        sessions={sessions}
-        season={profile.season}
-        onSeasonChange={(season) =>
-          changeProfile({ ...profile, season, seasonsTried: Array.from(new Set([...profile.seasonsTried, season])) })
-        }
-      />
-      <CollectionScreen active={tab === 'collection'} profile={profile} coins={coins} onChange={changeProfile} />
-      <AchievementsScreen active={tab === 'achievements'} stats={stats} unlockedAt={profile.achievements} />
+      {visited.has('stats') && (
+        <StatsScreen
+          active={tab === 'stats'}
+          sessions={sessions}
+          season={profile.season}
+          onSeasonChange={(season) =>
+            changeProfile({ ...profile, season, seasonsTried: Array.from(new Set([...profile.seasonsTried, season])) })
+          }
+        />
+      )}
+      {visited.has('collection') && (
+        <CollectionScreen active={tab === 'collection'} profile={profile} coins={coins} onChange={changeProfile} />
+      )}
+      {visited.has('achievements') && (
+        <AchievementsScreen active={tab === 'achievements'} stats={stats} unlockedAt={profile.achievements} />
+      )}
       {toast && <AchievementToast key={toast.id} achievement={toast} onDone={dismissToast} />}
-      {!running && <TabBar active={tab} onChange={setTab} />}
+      {!running && <TabBar active={tab} onChange={goTab} />}
     </SafeAreaView>
   );
 }

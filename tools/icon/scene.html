@@ -204,10 +204,10 @@
         // ikon utama (iOS/umum): opak, tanpa transparansi
         out['icon.png'] = url(compose(color, { size: 1024, bg: 'gradient', fit: 0.74 }));
         // adaptive icon Android: konten harus di zona aman (sekitar 66% bagian tengah)
-        out['android-icon-background.png'] = url(gradientBackground(1024));
+        out['android-icon-background.png'] = url(gradientBackground(512));
         out['android-icon-foreground.png'] = url(compose(color, { size: 1024, fit: 0.54 }));
         out['android-icon-monochrome.png'] = url(compose(mono, { size: 1024, fit: 0.54, glow: false, sparkles: false }));
-        out['splash-icon.png'] = url(compose(color, { size: 1024, fit: 0.8 }));
+        out['splash-icon.png'] = url(compose(color, { size: 512, fit: 0.8 }));
         const fav = document.createElement('canvas');
         fav.width = fav.height = 64;
         const fctx = fav.getContext('2d');

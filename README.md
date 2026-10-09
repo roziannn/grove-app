@@ -87,3 +87,10 @@ Skrip ini menulis ulang `icon.png`, `android-icon-*.png`, `splash-icon.png`, dan
 
 Ikon launcher tertanam di APK, jadi perubahan ikon baru terlihat setelah build APK baru
 (`npx eas-cli build -p android --profile preview`), bukan lewat `eas update`.
+
+## Performa dan ukuran
+
+- Layar selain Fokus baru dipasang saat pertama dibuka, dan animasi ikon prestasi berhenti saat layarnya tidak terlihat.
+- Timer sesi panjang (> 10 menit) memperbarui tampilan sekali per detik; sesi pendek 4x per detik agar cincin progres mulus.
+- Build Android: hanya arm64, R8 minify, shrink resources, dan pustaka native dikompres (`app.json`, plugin `expo-build-properties`).
+- Untuk Play Store, pakai profil `production` (.aab): unduhan pengguna biasanya lebih kecil daripada APK.
