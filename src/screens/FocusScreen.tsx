@@ -3,6 +3,8 @@ import { Alert, Animated, AppState, Pressable, StyleSheet, Text, View } from 're
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Updates from 'expo-updates';
 import Tree from '../Tree';
+import DailyRewardModal from '../DailyRewardModal';
+import type { DailyView } from '../daily';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { TAGS, getSpecies } from '../species';
@@ -40,11 +42,22 @@ type Props = {
   profile: Profile;
   coins: number;
   streak: number;
+  daily: DailyView;
+  onClaimDaily: () => void;
   onFinished: (s: Session) => void;
   onRunningChange: (running: boolean) => void;
 };
 
-export default function FocusScreen({ active, profile, coins, streak, onFinished, onRunningChange }: Props) {
+export default function FocusScreen({
+  active,
+  profile,
+  coins,
+  streak,
+  daily,
+  onClaimDaily,
+  onFinished,
+  onRunningChange,
+}: Props) {
   const [phase, setPhase] = useState<Phase>('idle');
   const [minutes, setMinutes] = useState(25);
   const [tag, setTag] = useState(TAGS[0]);
@@ -52,6 +65,7 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
   const [earned, setEarned] = useState(0);
   const [updateMsg, setUpdateMsg] = useState('');
   const [checking, setChecking] = useState(false);
+  const [showDaily, setShowDaily] = useState(false);
   const startedAt = useRef(0);
   const leftAt = useRef<number | null>(null);
   const finished = useRef(false);
@@ -173,6 +187,13 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
               : 'Pilih kegiatan dan durasi, lalu tanam pohon'}
       </Text>
 
+      {phase !== 'running' && (
+        <Pressable style={styles.giftBtn} onPress={() => setShowDaily(true)} accessibilityLabel="Hadiah harian">
+          <Text style={styles.giftText}>🎁 Hadiah harian</Text>
+          {daily.canClaim && <View style={styles.giftDot} />}
+        </Pressable>
+      )}
+
       <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
         <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} glow />
       </Animated.View>
@@ -232,6 +253,7 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
           {updateMsg !== '' && <Text style={styles.updateMsg}>{updateMsg}</Text>}
         </View>
       )}
+      <DailyRewardModal visible={showDaily} view={daily} onClose={() => setShowDaily(false)} onClaim={onClaimDaily} />
     </Screen>
   );
 }
@@ -248,6 +270,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pillText: { color: GREEN_DARK, fontWeight: '700' },
+  giftBtn: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff4d6',
+    borderWidth: 1.5,
+    borderColor: '#f9a825',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+  },
+  giftText: { color: '#8a5a00', fontWeight: '800' },
+  giftDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#e53935', marginLeft: 8 },
   subtitle: { fontSize: 15, color: TEXT_SOFT, marginTop: 8, textAlign: 'center' },
   stage: { marginVertical: 16, backgroundColor: '#f1f8e9', borderRadius: 140, padding: 8 },
   timer: { fontSize: 52, fontWeight: '700', color: GREEN_DARK, marginBottom: 12 },

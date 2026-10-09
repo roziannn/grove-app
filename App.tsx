@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { AppState, SafeAreaView, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import TabBar, { TabKey } from './src/TabBar';
 import FocusScreen from './src/screens/FocusScreen';
@@ -9,6 +9,7 @@ import AchievementsScreen from './src/screens/AchievementsScreen';
 import AchievementToast from './src/AchievementToast';
 import { ACHIEVEMENTS, computeStats, getAchievement, isDone } from './src/achievements';
 import { BG } from './src/theme';
+import { applyClaim, dailyView, dateKey } from './src/daily';
 import { SPECIES } from './src/species';
 import { START_COINS, coinsFor, currentStreak } from './src/stats';
 import {
@@ -55,10 +56,31 @@ export default function App() {
   const coins = useMemo(() => {
     const earned = sessions.reduce((a, s) => a + coinsFor(s), 0);
     const spent = SPECIES.filter((sp) => profile.unlocked.includes(sp.id)).reduce((a, sp) => a + sp.price, 0);
-    return START_COINS + earned - spent;
-  }, [sessions, profile.unlocked]);
+    return START_COINS + earned + profile.dailyCoins - spent;
+  }, [sessions, profile.unlocked, profile.dailyCoins]);
 
   const streak = useMemo(() => currentStreak(sessions), [sessions]);
+
+  // Tanggal hari ini; diperbarui saat app dibuka lagi atau lewat tengah malam.
+  const [today, setToday] = useState(dateKey());
+  useEffect(() => {
+    const check = () => setToday(dateKey());
+    const sub = AppState.addEventListener('change', (st) => st === 'active' && check());
+    const id = setInterval(check, 60_000);
+    return () => {
+      sub.remove();
+      clearInterval(id);
+    };
+  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const daily = useMemo(() => dailyView(profile), [profile.dailyLast, profile.dailyDay, today]);
+  const claimDaily = useCallback(() => {
+    setProfile((prev) => {
+      const next = applyClaim(prev);
+      if (next !== prev) saveProfile(next);
+      return next;
+    });
+  }, []);
   const stats = useMemo(
     () => computeStats(sessions, profile),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,6 +117,8 @@ export default function App() {
         profile={profile}
         coins={coins}
         streak={streak}
+        daily={daily}
+        onClaimDaily={claimDaily}
         onFinished={addSession}
         onRunningChange={setRunning}
       />

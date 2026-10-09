@@ -24,6 +24,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 - **Koleksi**: Mulai dengan 500 koin (`START_COINS` di `src/stats.ts`); 1 menit fokus berhasil = 1 koin. Tukar koin dengan 16 jenis pohon dan tanaman (Pinus, Kaktus, Sakura, Teratai, Jacaranda, Bunga Harapan, dll.).
 - **Musim tanah hutan**: ☀️ Panas, 🌸 Semi, 🍂 Gugur, ❄️ Dingin (pilih di tab Statistik; ikut mengubah latar di layar Fokus).
 - Tanaman bercahaya lembut (soft glow) yang ikut tumbuh bersama progres, dengan kilau kecil saat dewasa.
+- **Hadiah harian**: tombol 🎁 di layar Fokus. Klaim tiap hari: 10, 20, 30 ... 70 koin (hari 1-7). Lewat sehari atau selesai hari ke-7, kembali ke hari 1.
 - **Prestasi**: 30 pencapaian (menanam, waktu fokus, konsisten, kebiasaan, kegiatan, koleksi, spesial) dengan ikon beranimasi, bar progres, dan banner saat terbuka. Sesi "Tes 10 dtk" tidak dihitung.
 - **Streak** hari berturut-turut, tombol **Cek update**, dan menu melayang di bawah.
 
