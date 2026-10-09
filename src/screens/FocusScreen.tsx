@@ -12,11 +12,22 @@ import { Screen } from '../ui';
 import { GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { TAGS, TAG_ICONS, getSpecies, ringColor, tagLabel } from '../species';
 import { getSeason } from '../seasons';
+import { shortDate } from '../stats';
 import type { Profile, Session } from '../storage';
 
 type Phase = 'idle' | 'running' | 'success' | 'failed';
 
 // Sesi sampai batas ini diperbarui lebih sering (4x/detik) supaya cincin progres tetap mulus.
+// Ringkasan "app ini jalan dari mana", supaya jelas apakah tombol update bisa dipakai.
+function buildStatus(): string {
+  if (__DEV__) return 'Mode development (Expo Go / server dev)';
+  if (!Updates.isEnabled) return 'Build ini tidak mendukung update';
+  if (Updates.isEmbeddedLaunch || !Updates.createdAt) return `Versi bawaan APK · channel ${Updates.channel ?? '-'}`;
+  const d = Updates.createdAt;
+  const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  return `Update ${shortDate(d)} ${hm} · channel ${Updates.channel ?? '-'}`;
+}
+
 const SHORT_SESSION_MS = 10 * 60_000;
 
 // Ukuran pohon di dalam lingkaran (lingkaran = ini + padding 6 di tiap sisi).
@@ -148,7 +159,14 @@ export default function FocusScreen({
 
   const checkUpdate = async () => {
     if (!Updates.isEnabled) {
-      setUpdateMsg('Update hanya jalan di app hasil build (APK), bukan saat development.');
+      // Penjelasan panjang lewat dialog supaya tidak menumpuk ke tombol tanam; di layar cukup satu baris.
+      setUpdateMsg('Update tidak tersedia di mode ini');
+      Alert.alert(
+        'Update tidak tersedia',
+        __DEV__
+          ? 'Kamu sedang membuka app lewat Expo Go atau server development, jadi tombol update tidak bisa dipakai di sini.\n\nPasang APK hasil build, lalu buka dari ikon Grove.'
+          : 'APK ini dibuat tanpa pengaturan update (alamat update belum terisi).\n\nJalankan "npx eas-cli update:configure", lalu build APK baru.',
+      );
       return;
     }
     setChecking(true);
@@ -264,6 +282,7 @@ export default function FocusScreen({
           <Pressable onPress={checkUpdate} disabled={checking} hitSlop={10}>
             <Text style={[styles.updateText, checking && styles.updateOff]}>🔄 Cek update</Text>
           </Pressable>
+          <Text style={styles.updateInfo}>{buildStatus()}</Text>
           {updateMsg !== '' && <Text style={styles.updateMsg}>{updateMsg}</Text>}
         </View>
       )}
@@ -327,5 +346,6 @@ const styles = StyleSheet.create({
   updateBox: { position: 'absolute', left: 0, right: 0, bottom: 104, alignItems: 'center' },
   updateText: { color: TEXT_SOFT, fontWeight: '600', fontSize: 13 },
   updateOff: { opacity: 0.5 },
+  updateInfo: { marginTop: 3, color: '#8a9a8b', fontSize: 11 },
   updateMsg: { marginTop: 6, color: TEXT_SOFT, fontSize: 12.5, textAlign: 'center' },
 });
