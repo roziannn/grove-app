@@ -174,7 +174,7 @@ export default function FocusScreen({ active, profile, coins, streak, onFinished
       </Text>
 
       <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
-        <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} />
+        <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} glow />
       </Animated.View>
 
       {phase === 'running' && (
