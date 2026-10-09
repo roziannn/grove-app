@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
@@ -12,8 +12,8 @@ type Props = {
 // Ikon prestasi. Yang sudah terbuka bergerak pelan dan bercahaya; yang terkunci diam dan pudar.
 // Ketuk untuk memantulkan ikon.
 export default function AchievementBadge({ icon, color, unlocked, size = 56, seed = 0 }: Props) {
-  const loop = useRef(new Animated.Value(0)).current;
-  const bounce = useRef(new Animated.Value(1)).current;
+  const [loop] = useState(() => new Animated.Value(0));
+  const [bounce] = useState(() => new Animated.Value(1));
   const variant = seed % 4;
 
   useEffect(() => {

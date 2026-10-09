@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { DAILY_REWARDS, DailyView } from './daily';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from './theme';
@@ -38,9 +38,9 @@ function Tile({ day, view, pulse }: { day: number; view: DailyView; pulse: Anima
 
 // Kalender hadiah koin 7 hari. Klaim berturut-turut; lewat sehari atau selesai hari ke-7 mengulang dari hari ke-1.
 export default function DailyRewardModal({ visible, view, onClose, onClaim }: Props) {
-  const pulse = useRef(new Animated.Value(0)).current;
-  const float = useRef(new Animated.Value(0)).current;
-  const [gain, setGain] = React.useState(0);
+  const [pulse] = useState(() => new Animated.Value(0));
+  const [float] = useState(() => new Animated.Value(0));
+  const [gain, setGain] = useState(0);
 
   useEffect(() => {
     if (!visible) return;

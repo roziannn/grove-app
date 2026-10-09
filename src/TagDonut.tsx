@@ -20,13 +20,11 @@ export default function TagDonut({ items }: { items: Item[] }) {
   const total = items.reduce((a, t) => a + t.minutes, 0);
   if (total <= 0) return null;
 
-  let offset = 0;
-  const slices = items.map((t) => {
+  const slices = items.map((t, i) => {
     const share = t.minutes / total;
+    const before = items.slice(0, i).reduce((a, x) => a + x.minutes, 0);
     const len = Math.max(0, share * C - (items.length > 1 ? GAP : 0));
-    const slice = { ...t, share, len, offset };
-    offset += share * C;
-    return slice;
+    return { ...t, share, len, offset: (before / total) * C };
   });
 
   return (
