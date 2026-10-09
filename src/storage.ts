@@ -13,9 +13,19 @@ export type Profile = {
   unlocked: string[]; // id jenis pohon yang sudah dibeli
   selected: string; // jenis pohon yang dipakai
   season: string; // musim tanah hutan
+  seasonsTried: string[]; // musim yang pernah dicoba (untuk prestasi)
+  achievements: Record<string, number>; // id prestasi -> waktu terbuka (0 = sudah tercapai sebelum fitur ada)
+  achVersion: number; // 0 = belum pernah dievaluasi (migrasi senyap)
 };
 
-export const DEFAULT_PROFILE: Profile = { unlocked: ['oak'], selected: 'oak', season: 'summer' };
+export const DEFAULT_PROFILE: Profile = {
+  unlocked: ['oak'],
+  selected: 'oak',
+  season: 'summer',
+  seasonsTried: ['summer'],
+  achievements: {},
+  achVersion: 0,
+};
 
 const SESSIONS_KEY = 'grove:sessions';
 const PROFILE_KEY = 'grove:profile';
@@ -40,8 +50,8 @@ async function write(key: string, value: unknown): Promise<void> {
 export const loadSessions = () => read<Session[]>(SESSIONS_KEY, []);
 export const saveSessions = (list: Session[]) => write(SESSIONS_KEY, list);
 // Digabung dengan nilai bawaan supaya profil lama (tanpa field baru) tetap valid.
-export const loadProfile = async (): Promise<Profile> => ({
-  ...DEFAULT_PROFILE,
-  ...(await read<Partial<Profile>>(PROFILE_KEY, {})),
-});
+export const loadProfile = async (): Promise<Profile> => {
+  const p: Profile = { ...DEFAULT_PROFILE, ...(await read<Partial<Profile>>(PROFILE_KEY, {})) };
+  return { ...p, seasonsTried: Array.from(new Set([...p.seasonsTried, p.season])) };
+};
 export const saveProfile = (p: Profile) => write(PROFILE_KEY, p);
