@@ -20,8 +20,8 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 ## Fitur
 
 - **Fokus**: pilih kegiatan (Belajar, Membaca, Kerja, ...) dan durasi, lalu tanam pohon.
-- **Statistik**: Hari / Minggu / Bulan / Tahun dengan hutan isometrik, grafik waktu fokus, dan rincian per kegiatan.
-- **Koleksi**: 1 menit fokus berhasil = 1 koin. Tukar koin dengan jenis pohon baru (Pinus, Kaktus, Sakura, Maple).
+- **Statistik**: Hari / Minggu / Bulan / Tahun dengan hutan isometrik, grafik waktu fokus, rincian per kegiatan, dan diagram donat distribusi kegiatan.
+- **Koleksi**: 1 menit fokus berhasil = 1 koin. Tukar koin dengan 16 jenis pohon dan tanaman (Pinus, Kaktus, Sakura, Teratai, Jacaranda, Bunga Harapan, dll.).
 - **Musim tanah hutan**: ☀️ Panas, 🌸 Semi, 🍂 Gugur, ❄️ Dingin (pilih di tab Statistik; ikut mengubah latar di layar Fokus).
 - **Streak** hari berturut-turut, tombol **Cek update**, dan menu melayang di bawah.
 
@@ -30,6 +30,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 - `App.tsx` – state utama (riwayat sesi, koin) dan pergantian tab
 - `src/screens/` – layar Fokus, Statistik, Koleksi
 - `src/Tree.tsx` – gambar pohon (SVG) yang tumbuh sesuai progres; `src/IsoForest.tsx` – hutan isometrik
+- `src/TagDonut.tsx` – diagram donat distribusi kegiatan
 - `src/stats.ts` – hitungan periode, grafik, streak, koin
 - `src/species.ts` – jenis pohon dan label kegiatan; `src/seasons.ts` – tema musim
 - `src/storage.ts` – simpan riwayat sesi dan profil di HP (AsyncStorage)

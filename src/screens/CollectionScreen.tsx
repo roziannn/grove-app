@@ -34,12 +34,12 @@ export default function CollectionScreen({ active, profile, coins, onChange }: P
       <Text style={styles.hint}>1 menit fokus yang berhasil = 1 koin. Pohon yang layu tidak memberi koin.</Text>
 
       <View style={styles.grid}>
-        {SPECIES.map((sp) => {
+        {[...SPECIES].sort((a, b) => a.price - b.price).map((sp) => {
           const owned = profile.unlocked.includes(sp.id);
           const selected = profile.selected === sp.id;
           return (
             <View key={sp.id} style={[styles.item, selected && styles.itemOn]}>
-              <Tree progress={1} species={sp} size={110} />
+              <Tree progress={1} species={sp} size={88} />
               <Text style={styles.name}>{sp.name}</Text>
               {owned ? (
                 <Pressable
@@ -57,6 +57,10 @@ export default function CollectionScreen({ active, profile, coins, onChange }: P
             </View>
           );
         })}
+        {/* penyeimbang supaya baris terakhir tetap rata kiri */}
+        {Array.from({ length: (3 - (SPECIES.length % 3)) % 3 }, (_, i) => (
+          <View key={`pad${i}`} style={styles.pad} />
+        ))}
       </View>
     </Screen>
   );
@@ -68,21 +72,22 @@ const styles = StyleSheet.create({
   coinText: { color: GREEN_DARK, fontWeight: '800', fontSize: 18 },
   hint: { color: TEXT_SOFT, fontSize: 13, textAlign: 'center', marginTop: 8, marginBottom: 12 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignSelf: 'stretch' },
+  pad: { width: '31.5%' },
   item: {
-    width: '48%',
+    width: '31.5%',
     backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 18,
+    padding: 6,
     alignItems: 'center',
     marginBottom: 14,
     borderWidth: 2,
     borderColor: 'transparent',
   },
   itemOn: { borderColor: GREEN },
-  name: { fontWeight: '700', color: GREEN_DARK, marginTop: 2 },
-  btn: { marginTop: 8, backgroundColor: GREEN, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 18 },
+  name: { fontWeight: '700', color: GREEN_DARK, marginTop: 2, fontSize: 12, textAlign: 'center', minHeight: 30 },
+  btn: { marginTop: 6, backgroundColor: GREEN, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, minWidth: 74, alignItems: 'center' },
   btnBuy: { backgroundColor: '#f9a825' },
   btnDone: { backgroundColor: '#e8f5e9', borderWidth: 1, borderColor: BORDER },
-  btnText: { color: '#fff', fontWeight: '700' },
+  btnText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   btnDoneText: { color: GREEN },
 });
