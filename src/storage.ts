@@ -16,6 +16,9 @@ export type Profile = {
   seasonsTried: string[]; // musim yang pernah dicoba (untuk prestasi)
   achievements: Record<string, number>; // id prestasi -> waktu terbuka (0 = sudah tercapai sebelum fitur ada)
   achVersion: number; // 0 = belum pernah dievaluasi (migrasi senyap)
+  dailyLast: string; // tanggal klaim hadiah harian terakhir (YYYY-MM-DD), kosong = belum pernah
+  dailyDay: number; // hari ke-berapa (1..7) pada klaim terakhir
+  dailyCoins: number; // total koin dari hadiah harian
 };
 
 export const DEFAULT_PROFILE: Profile = {
@@ -25,6 +28,9 @@ export const DEFAULT_PROFILE: Profile = {
   seasonsTried: ['summer'],
   achievements: {},
   achVersion: 0,
+  dailyLast: '',
+  dailyDay: 0,
+  dailyCoins: 0,
 };
 
 const SESSIONS_KEY = 'grove:sessions';
