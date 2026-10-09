@@ -94,3 +94,25 @@ Ikon launcher tertanam di APK, jadi perubahan ikon baru terlihat setelah build A
 - Timer sesi panjang (> 10 menit) memperbarui tampilan sekali per detik; sesi pendek 4x per detik agar cincin progres mulus.
 - Build Android: hanya arm64, R8 minify, shrink resources, dan pustaka native dikompres (`app.json`, plugin `expo-build-properties`).
 - Untuk Play Store, pakai profil `production` (.aab): unduhan pengguna biasanya lebih kecil daripada APK.
+
+## Alur kerja harian (supaya tombol "Cek update" di HP berfungsi)
+
+Tombol update hanya jalan di **APK hasil build**, bukan di Expo Go / `expo start`.
+
+Sekali saja (atau saat ada perubahan native: ikon, paket baru, izin):
+
+```bash
+git pull
+npm install
+npm run apk          # build APK di server Expo, lalu pasang di HP dan buka dari ikon Grove
+```
+
+Setiap ada perubahan JavaScript (tampilan, fitur, tanaman baru):
+
+```bash
+git pull
+npm run ship         # kirim update; isi pesan singkat, pilih environment preview bila ditanya
+```
+
+Lalu di HP: buka Grove, tekan **Cek update**. Baris kecil di bawah tombol menunjukkan status build:
+"Versi bawaan APK · channel preview" atau "Update <tanggal> · channel preview" artinya normal.

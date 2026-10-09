@@ -21,7 +21,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "apk": "npx eas-cli build -p android --profile preview",
+    "ship": "npx eas-cli update --channel preview --environment preview --platform android"
   },
   "private": true
 }
