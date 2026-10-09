@@ -20,7 +20,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 ## Fitur
 
 - **Fokus**: pilih kegiatan lewat daftar berikon (Belajar ngoding, Kerja, Proyek, Membaca, Lainnya), geser penggaris untuk memilih durasi (5-120 menit, atau tes 10 detik), lalu tanam pohon.
-- **Statistik**: Hari / Minggu / Bulan / Tahun dengan hutan isometrik, grafik waktu fokus, rincian per kegiatan, dan diagram donat distribusi kegiatan.
+- **Statistik**: Hari / Minggu / Bulan / Tahun dengan hutan isometrik, grafik waktu fokus, rincian per kegiatan, diagram donat distribusi kegiatan, dan 3 pohon favorit.
 - **Koleksi**: Mulai dengan 500 koin (`START_COINS` di `src/stats.ts`); 1 menit fokus berhasil = 1 koin. Tukar koin dengan 16 jenis pohon dan tanaman (Pinus, Kaktus, Sakura, Teratai, Jacaranda, Bunga Harapan, dll.).
 - **Musim tanah hutan**: ☀️ Panas, 🌸 Semi, 🍂 Gugur, ❄️ Dingin (pilih di tab Statistik; ikut mengubah latar di layar Fokus).
 - Tanaman bercahaya lembut (soft glow) yang ikut tumbuh bersama progres, dengan kilau kecil saat dewasa.

@@ -5,8 +5,9 @@ import TagDonut from '../TagDonut';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { SEASONS, getSeason } from '../seasons';
-import { tagLabel } from '../species';
-import { Range, bucketMinutes, fmtDuration, getPeriod, inPeriod, tagTotals } from '../stats';
+import { getSpecies, tagLabel } from '../species';
+import Tree from '../Tree';
+import { Range, bucketMinutes, fmtDuration, getPeriod, inPeriod, speciesRanking, tagTotals } from '../stats';
 import type { Session } from '../storage';
 
 const RANGES: { key: Range; label: string }[] = [
@@ -36,6 +37,7 @@ export default function StatsScreen({ active, sessions, season, onSeasonChange }
   const totalMinutes = grown.reduce((a, s) => a + s.minutes, 0);
   const buckets = useMemo(() => bucketMinutes(grown, range, period), [grown, range, period]);
   const tags = useMemo(() => tagTotals(grown), [grown]);
+  const favorites = useMemo(() => speciesRanking(grown).slice(0, 3), [grown]);
   const max = Math.max(1, ...buckets.values);
 
   const lifetimeMinutes = sessions.filter((s) => s.ok).reduce((a, s) => a + s.minutes, 0);
@@ -142,6 +144,38 @@ export default function StatsScreen({ active, sessions, season, onSeasonChange }
         </View>
       )}
 
+      {favorites.length > 0 && (
+        <View style={styles.card}>
+          <View style={styles.favHead}>
+            <View style={styles.crown}>
+              <Text style={styles.crownText}>👑</Text>
+            </View>
+            <Text style={[styles.cardTitle, styles.favTitle]}>Pohon favorit</Text>
+          </View>
+          <View style={styles.divider} />
+          {favorites.map((f, i) => {
+            const sp = getSpecies(f.id);
+            return (
+              <View key={f.id} style={styles.favRow}>
+                <Text style={styles.favRank}>{i + 1}.</Text>
+                <Tree progress={1} species={sp} size={60} />
+                <View style={styles.favMid}>
+                  <Text style={styles.favName} numberOfLines={1}>
+                    {sp.name}
+                  </Text>
+                  <View style={styles.favTrack}>
+                    <View
+                      style={[styles.favFill, { width: `${(f.count / favorites[0].count) * 100}%`, backgroundColor: sp.mid }]}
+                    />
+                  </View>
+                </View>
+                <Text style={styles.favCount}>{f.count} kali</Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Sepanjang waktu</Text>
         <Text style={styles.life}>
@@ -205,5 +239,17 @@ const styles = StyleSheet.create({
   tagMin: { color: TEXT_SOFT },
   tagTrack: { height: 8, borderRadius: 4, backgroundColor: '#e0e8e0', marginTop: 4, overflow: 'hidden' },
   tagFill: { height: 8, borderRadius: 4, backgroundColor: '#66bb6a' },
+  favHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  favTitle: { marginBottom: 0 },
+  crown: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff4d6', alignItems: 'center', justifyContent: 'center' },
+  crownText: { fontSize: 14 },
+  divider: { height: 1, backgroundColor: '#eef2ee', marginVertical: 12 },
+  favRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  favRank: { width: 22, fontSize: 17, fontWeight: '800', color: '#9db09e' },
+  favMid: { flex: 1 },
+  favName: { color: TEXT_SOFT, fontWeight: '600', marginBottom: 6 },
+  favTrack: { height: 12, borderRadius: 6, backgroundColor: '#eef2ee', overflow: 'hidden' },
+  favFill: { height: 12, borderRadius: 6 },
+  favCount: { width: 52, textAlign: 'right', color: TEXT_SOFT, fontWeight: '700', fontSize: 13 },
   life: { color: TEXT_SOFT },
 });
