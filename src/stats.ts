@@ -111,5 +111,8 @@ export function fmtDuration(minutes: number): string {
   return m === 0 ? `${h} jam` : `${h} jam ${m} mnt`;
 }
 
+// Saldo koin awal untuk semua pengguna. Ubah angka ini kalau mau saldo awal berbeda.
+export const START_COINS = 500;
+
 // 1 menit fokus = 1 koin (sesi tes 10 detik tidak menghasilkan koin).
 export const coinsFor = (s: Session) => (s.ok ? Math.floor(s.minutes) : 0);

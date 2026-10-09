@@ -10,7 +10,7 @@ import AchievementToast from './src/AchievementToast';
 import { ACHIEVEMENTS, computeStats, getAchievement, isDone } from './src/achievements';
 import { BG } from './src/theme';
 import { SPECIES } from './src/species';
-import { coinsFor, currentStreak } from './src/stats';
+import { START_COINS, coinsFor, currentStreak } from './src/stats';
 import {
   DEFAULT_PROFILE,
   Profile,
@@ -51,11 +51,11 @@ export default function App() {
     saveProfile(p);
   }, []);
 
-  // Koin = hasil fokus dikurangi harga pohon yang sudah dibeli.
+  // Koin = saldo awal + hasil fokus - harga pohon yang sudah dibeli.
   const coins = useMemo(() => {
     const earned = sessions.reduce((a, s) => a + coinsFor(s), 0);
     const spent = SPECIES.filter((sp) => profile.unlocked.includes(sp.id)).reduce((a, sp) => a + sp.price, 0);
-    return earned - spent;
+    return START_COINS + earned - spent;
   }, [sessions, profile.unlocked]);
 
   const streak = useMemo(() => currentStreak(sessions), [sessions]);

@@ -4,6 +4,7 @@ import Tree from '../Tree';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { SPECIES, glowColor } from '../species';
+import { START_COINS } from '../stats';
 import type { Profile } from '../storage';
 
 type Props = {
@@ -31,7 +32,7 @@ export default function CollectionScreen({ active, profile, coins, onChange }: P
       <View style={styles.coinBox}>
         <Text style={styles.coinText}>🪙 {coins} koin</Text>
       </View>
-      <Text style={styles.hint}>1 menit fokus yang berhasil = 1 koin. Pohon yang layu tidak memberi koin.</Text>
+      <Text style={styles.hint}>Kamu mulai dengan {START_COINS} koin. 1 menit fokus yang berhasil = 1 koin; pohon yang layu tidak memberi koin.</Text>
 
       <View style={styles.grid}>
         {[...SPECIES].sort((a, b) => a.price - b.price).map((sp) => {
