@@ -23,3 +23,15 @@ export const getSpecies = (id?: string): Species =>
   SPECIES.find((s) => s.id === id) ?? DEFAULT_SPECIES;
 
 export const TAGS = ['Belajar', 'Membaca', 'Kerja', 'Proyek', 'Lainnya'];
+
+// Warna tetap per label supaya konsisten di semua diagram.
+export const TAG_COLORS: Record<string, string> = {
+  Belajar: '#43a047',
+  Membaca: '#29b6f6',
+  Kerja: '#ffa726',
+  Proyek: '#ab47bc',
+  Lainnya: '#8d6e63',
+  'Tanpa label': '#b0bec5',
+};
+
+export const tagColor = (tag: string) => TAG_COLORS[tag] ?? '#90a4ae';

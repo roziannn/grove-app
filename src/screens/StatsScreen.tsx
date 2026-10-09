@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import IsoForest, { FOREST_CAPACITY } from '../IsoForest';
+import TagDonut from '../TagDonut';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { SEASONS, getSeason } from '../seasons';
@@ -130,6 +131,13 @@ export default function StatsScreen({ active, sessions, season, onSeasonChange }
               </View>
             </View>
           ))}
+        </View>
+      )}
+
+      {tags.length > 0 && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Distribusi</Text>
+          <TagDonut items={tags} />
         </View>
       )}
 
