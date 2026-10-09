@@ -5,6 +5,7 @@ import TagDonut from '../TagDonut';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
 import { SEASONS, getSeason } from '../seasons';
+import { tagLabel } from '../species';
 import { Range, bucketMinutes, fmtDuration, getPeriod, inPeriod, tagTotals } from '../stats';
 import type { Session } from '../storage';
 
@@ -123,7 +124,7 @@ export default function StatsScreen({ active, sessions, season, onSeasonChange }
           {tags.map((t) => (
             <View key={t.tag} style={styles.tagRow}>
               <View style={styles.tagHead}>
-                <Text style={styles.tagName}>{t.tag}</Text>
+                <Text style={styles.tagName}>{tagLabel(t.tag)}</Text>
                 <Text style={styles.tagMin}>{fmtDuration(t.minutes)}</Text>
               </View>
               <View style={styles.tagTrack}>

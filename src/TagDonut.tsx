@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { tagColor } from './species';
+import { tagColor, tagLabel } from './species';
 import { fmtDuration } from './stats';
 import { GREEN_DARK, TEXT_SOFT } from './theme';
 
@@ -57,7 +57,7 @@ export default function TagDonut({ items }: { items: Item[] }) {
           <View key={s.tag} style={styles.item}>
             <View style={[styles.dot, { backgroundColor: tagColor(s.tag) }]} />
             <Text style={styles.name} numberOfLines={1}>
-              {s.tag}
+              {tagLabel(s.tag)}
             </Text>
             <Text style={styles.pct}>{pct(s.share * 100)}</Text>
           </View>

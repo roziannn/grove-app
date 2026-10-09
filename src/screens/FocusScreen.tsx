@@ -4,23 +4,16 @@ import { useKeepAwake } from 'expo-keep-awake';
 import * as Updates from 'expo-updates';
 import Tree from '../Tree';
 import DailyRewardModal from '../DailyRewardModal';
+import ActivityPicker from '../ActivityPicker';
+import DurationPicker, { DEFAULT_MINUTES } from '../DurationPicker';
 import type { DailyView } from '../daily';
 import { Screen } from '../ui';
-import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
-import { TAGS, TAG_ICONS, getSpecies } from '../species';
+import { GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
+import { TAGS, TAG_ICONS, getSpecies, tagLabel } from '../species';
 import { getSeason } from '../seasons';
 import type { Profile, Session } from '../storage';
 
 type Phase = 'idle' | 'running' | 'success' | 'failed';
-
-// Durasi dalam menit. 10 detik hanya untuk mencoba animasi (tidak memberi koin/prestasi).
-const DURATIONS = [
-  { short: '10 dtk', long: 'Tes 10 detik', minutes: 10 / 60 },
-  { short: '15', long: '15 menit', minutes: 15 },
-  { short: '25', long: '25 menit', minutes: 25 },
-  { short: '45', long: '45 menit', minutes: 45 },
-  { short: '60', long: '60 menit', minutes: 60 },
-];
 
 // Boleh keluar app sebentar (mis. lihat notifikasi) sebelum pohon layu.
 const GRACE_MS = 10_000;
@@ -59,7 +52,7 @@ export default function FocusScreen({
   onRunningChange,
 }: Props) {
   const [phase, setPhase] = useState<Phase>('idle');
-  const [minutes, setMinutes] = useState(25);
+  const [minutes, setMinutes] = useState(DEFAULT_MINUTES);
   const [tag, setTag] = useState(TAGS[0]);
   const [now, setNow] = useState(() => Date.now());
   const [startedAt, setStartedAt] = useState(0);
@@ -67,6 +60,7 @@ export default function FocusScreen({
   const [updateMsg, setUpdateMsg] = useState('');
   const [checking, setChecking] = useState(false);
   const [showDaily, setShowDaily] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
   const leftAt = useRef<number | null>(null);
   const finished = useRef(false);
   const [pop] = useState(() => new Animated.Value(1));
@@ -165,94 +159,82 @@ export default function FocusScreen({
   const progress = phase === 'success' ? 1 : phase === 'running' ? Math.min(1, elapsed / durationMs) : 0;
 
   return (
-    <Screen active={active}>
+    <Screen active={active} grow>
       {phase === 'running' && <RunningKeepAwake />}
 
-      <View style={styles.topRow}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>🔥 {streak} hari</Text>
+      <View style={styles.top}>
+        <View style={styles.topRow}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>🔥 {streak} hari</Text>
+          </View>
+          <Pressable
+            style={[styles.badge, styles.badgeGift]}
+            onPress={() => setShowDaily(true)}
+            disabled={phase === 'running'}
+            accessibilityLabel="Hadiah harian"
+          >
+            <Text style={[styles.badgeText, styles.badgeGiftText]}>🎁 Hadiah</Text>
+            {daily.canClaim && <View style={styles.giftDot} />}
+          </Pressable>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>🪙 {coins}</Text>
+          </View>
         </View>
-        <Pressable
-          style={[styles.badge, styles.badgeGift]}
-          onPress={() => setShowDaily(true)}
-          disabled={phase === 'running'}
-          accessibilityLabel="Hadiah harian"
-        >
-          <Text style={[styles.badgeText, styles.badgeGiftText]}>🎁 Hadiah</Text>
-          {daily.canClaim && <View style={styles.giftDot} />}
-        </Pressable>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>🪙 {coins}</Text>
-        </View>
+
+        {phase === 'idle' && (
+          <Pressable style={styles.activity} onPress={() => setShowActivity(true)} accessibilityLabel="Pilih kegiatan">
+            <View style={styles.activityIcon}>
+              <Text style={styles.activityIconText}>{TAG_ICONS[tag]}</Text>
+            </View>
+            <View style={styles.activityText}>
+              <Text style={styles.activityCaption}>Pilih kegiatan</Text>
+              <Text style={styles.activityName}>{tagLabel(tag)}</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </Pressable>
+        )}
       </View>
 
-      <Text style={styles.subtitle}>
-        {phase === 'running'
-          ? `${TAG_ICONS[tag] ?? ''} ${tag} · tetap di app ini, pohonmu sedang tumbuh`
-          : phase === 'success'
-            ? `Hebat! Pohonmu tumbuh 🎉${earned > 0 ? `  +${earned} koin` : ''}`
-            : phase === 'failed'
-              ? 'Yah, pohonmu layu 🥀'
-              : 'Siap fokus? Pilih kegiatan dan durasinya'}
-      </Text>
+      {/* Pohon, timer, dan tombol tanam dipusatkan di ruang antara bagian atas dan menu bawah. */}
+      <View style={styles.center}>
+        <Text style={styles.subtitle}>
+          {phase === 'running'
+            ? `${TAG_ICONS[tag] ?? ''} ${tagLabel(tag)} · tetap di app ini, pohonmu sedang tumbuh`
+            : phase === 'success'
+              ? `Hebat! Pohonmu tumbuh 🎉${earned > 0 ? `  +${earned} koin` : ''}`
+              : phase === 'failed'
+                ? 'Yah, pohonmu layu 🥀'
+                : 'Geser untuk memilih durasi'}
+        </Text>
 
-      <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
-        <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} size={220} glow />
-      </Animated.View>
+        <Animated.View style={[styles.stage, { backgroundColor: season.stageBg, transform: [{ scale: pop }] }]}>
+          <Tree progress={progress} withered={phase === 'failed'} species={species} season={season} size={220} glow />
+        </Animated.View>
 
-      {phase === 'running' && (
-        <>
-          <Text style={styles.timer}>{fmt(durationMs - elapsed)}</Text>
-          <Pressable style={[styles.btn, styles.btnGhost]} onPress={giveUp}>
-            <Text style={[styles.btnText, styles.btnGhostText]}>Menyerah</Text>
+        {phase === 'running' && (
+          <>
+            <Text style={styles.timer}>{fmt(durationMs - elapsed)}</Text>
+            <Pressable style={[styles.btn, styles.btnGhost]} onPress={giveUp}>
+              <Text style={[styles.btnText, styles.btnGhostText]}>Menyerah</Text>
+            </Pressable>
+          </>
+        )}
+
+        {phase === 'idle' && (
+          <>
+            <DurationPicker value={minutes} onChange={setMinutes} />
+            <Pressable style={styles.btn} onPress={start}>
+              <Text style={styles.btnText}>🌱 Tanam {species.name}</Text>
+            </Pressable>
+          </>
+        )}
+
+        {(phase === 'success' || phase === 'failed') && (
+          <Pressable style={styles.btn} onPress={() => setPhase('idle')}>
+            <Text style={styles.btnText}>Tanam lagi</Text>
           </Pressable>
-        </>
-      )}
-
-      {phase === 'idle' && (
-        <View style={styles.card}>
-          <Text style={styles.label}>Kegiatan</Text>
-          <View style={styles.tagRow}>
-            {TAGS.map((t) => (
-              <Pressable key={t} onPress={() => setTag(t)} style={[styles.tag, tag === t && styles.tagOn]}>
-                <Text style={styles.tagIcon}>{TAG_ICONS[t]}</Text>
-                <Text style={[styles.tagText, tag === t && styles.tagTextOn]} numberOfLines={1}>
-                  {t}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>Durasi</Text>
-            <Text style={styles.labelValue}>{DURATIONS.find((d) => d.minutes === minutes)?.long}</Text>
-          </View>
-          <View style={styles.segment}>
-            {DURATIONS.map((d, i) => {
-              const on = minutes === d.minutes;
-              return (
-                <Pressable
-                  key={d.short}
-                  onPress={() => setMinutes(d.minutes)}
-                  style={[styles.seg, i > 0 && styles.segDivider, on && styles.segOn]}
-                >
-                  <Text style={[styles.segText, on && styles.segTextOn]}>{d.short}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <Pressable style={[styles.btn, styles.btnFull]} onPress={start}>
-            <Text style={styles.btnText}>🌱 Tanam {species.name}</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {(phase === 'success' || phase === 'failed') && (
-        <Pressable style={[styles.btn, styles.btnFull]} onPress={() => setPhase('idle')}>
-          <Text style={styles.btnText}>Tanam lagi</Text>
-        </Pressable>
-      )}
+        )}
+      </View>
 
       {phase !== 'running' && (
         <View style={styles.updateBox}>
@@ -262,13 +244,16 @@ export default function FocusScreen({
           {updateMsg !== '' && <Text style={styles.updateMsg}>{updateMsg}</Text>}
         </View>
       )}
+
+      <ActivityPicker visible={showActivity} selected={tag} onSelect={setTag} onClose={() => setShowActivity(false)} />
       <DailyRewardModal visible={showDaily} view={daily} onClose={() => setShowDaily(false)} onClaim={onClaimDaily} />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  topRow: { flexDirection: 'row', gap: 10, alignSelf: 'stretch' },
+  top: { alignSelf: 'stretch', gap: 12 },
+  topRow: { flexDirection: 'row', gap: 10 },
   badge: {
     flex: 1,
     height: 40,
@@ -292,47 +277,31 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#fff4d6',
   },
-  subtitle: { fontSize: 14, color: TEXT_SOFT, marginTop: 12, textAlign: 'center' },
-  stage: { marginVertical: 14, backgroundColor: '#f1f8e9', borderRadius: 140, padding: 6 },
-  timer: { fontSize: 52, fontWeight: '700', color: GREEN_DARK },
-  card: { alignSelf: 'stretch', backgroundColor: '#fff', borderRadius: 24, padding: 16 },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 16 },
-  label: { color: TEXT_SOFT, fontWeight: '700', fontSize: 13, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.6 },
-  labelValue: { color: GREEN, fontWeight: '800', fontSize: 13, marginBottom: 8 },
-  tagRow: { flexDirection: 'row', gap: 6 },
-  tag: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: 14,
-    backgroundColor: '#f1f8f1',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  tagOn: { backgroundColor: '#e3f4e3', borderColor: GREEN },
-  tagIcon: { fontSize: 20 },
-  tagText: { color: TEXT_SOFT, fontWeight: '700', fontSize: 11, marginTop: 3 },
-  tagTextOn: { color: GREEN_DARK },
-  segment: {
+  activity: {
     flexDirection: 'row',
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: '#f1f8f1',
-    borderWidth: 1,
-    borderColor: BORDER,
-    overflow: 'hidden',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
-  seg: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  segDivider: { borderLeftWidth: 1, borderLeftColor: BORDER },
-  segOn: { backgroundColor: GREEN },
-  segText: { color: GREEN, fontWeight: '700', fontSize: 14 },
-  segTextOn: { color: '#fff' },
-  btn: { marginTop: 18, backgroundColor: GREEN, paddingHorizontal: 36, paddingVertical: 14, borderRadius: 28 },
-  btnFull: { alignSelf: 'stretch', alignItems: 'center', marginTop: 20 },
+  activityIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#e3f4e3', alignItems: 'center', justifyContent: 'center' },
+  activityIconText: { fontSize: 20 },
+  activityText: { flex: 1 },
+  activityCaption: { fontSize: 11, fontWeight: '700', color: TEXT_SOFT, textTransform: 'uppercase', letterSpacing: 0.6 },
+  activityName: { fontSize: 16, fontWeight: '800', color: GREEN_DARK },
+  chevron: { fontSize: 30, color: TEXT_SOFT, lineHeight: 32, paddingHorizontal: 6 },
+  center: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
+  subtitle: { fontSize: 14, color: TEXT_SOFT, textAlign: 'center', minHeight: 20 },
+  stage: { marginVertical: 12, backgroundColor: '#f1f8e9', borderRadius: 140, padding: 6 },
+  timer: { fontSize: 52, fontWeight: '700', color: GREEN_DARK },
+  btn: { marginTop: 18, backgroundColor: GREEN, paddingHorizontal: 40, paddingVertical: 14, borderRadius: 28 },
   btnText: { color: '#fff', fontSize: 17, fontWeight: '800' },
   btnGhost: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#c62828' },
   btnGhostText: { color: '#c62828' },
-  updateBox: { alignItems: 'center', marginTop: 18 },
+  // Di tepi bawah (di atas menu) agar tidak ikut menghitung ruang saat memusatkan pohon dan tombol.
+  updateBox: { position: 'absolute', left: 0, right: 0, bottom: 104, alignItems: 'center' },
   updateText: { color: TEXT_SOFT, fontWeight: '600', fontSize: 13 },
   updateOff: { opacity: 0.5 },
   updateMsg: { marginTop: 6, color: TEXT_SOFT, fontSize: 12.5, textAlign: 'center' },
