@@ -24,6 +24,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 - **Koleksi**: 1 menit fokus berhasil = 1 koin. Tukar koin dengan 16 jenis pohon dan tanaman (Pinus, Kaktus, Sakura, Teratai, Jacaranda, Bunga Harapan, dll.).
 - **Musim tanah hutan**: ☀️ Panas, 🌸 Semi, 🍂 Gugur, ❄️ Dingin (pilih di tab Statistik; ikut mengubah latar di layar Fokus).
 - Tanaman bercahaya lembut (soft glow) yang ikut tumbuh bersama progres, dengan kilau kecil saat dewasa.
+- **Prestasi**: 30 pencapaian (menanam, waktu fokus, konsisten, kebiasaan, kegiatan, koleksi, spesial) dengan ikon beranimasi, bar progres, dan banner saat terbuka. Sesi "Tes 10 dtk" tidak dihitung.
 - **Streak** hari berturut-turut, tombol **Cek update**, dan menu melayang di bawah.
 
 ## Struktur
@@ -32,6 +33,7 @@ Pilih **Tes 10 dtk** untuk melihat animasi pohon tumbuh dengan cepat.
 - `src/screens/` – layar Fokus, Statistik, Koleksi
 - `src/Tree.tsx` – gambar pohon (SVG) yang tumbuh sesuai progres; `src/IsoForest.tsx` – hutan isometrik
 - `src/TagDonut.tsx` – diagram donat distribusi kegiatan
+- `src/achievements.ts` – daftar 30 prestasi dan perhitungan statistiknya; `src/AchievementBadge.tsx`, `src/AchievementToast.tsx` – ikon dan banner
 - `src/stats.ts` – hitungan periode, grafik, streak, koin
 - `src/species.ts` – jenis pohon dan label kegiatan; `src/seasons.ts` – tema musim
 - `src/storage.ts` – simpan riwayat sesi dan profil di HP (AsyncStorage)

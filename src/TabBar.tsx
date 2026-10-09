@@ -2,12 +2,13 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GREEN_DARK } from './theme';
 
-export type TabKey = 'focus' | 'stats' | 'collection';
+export type TabKey = 'focus' | 'stats' | 'collection' | 'achievements';
 
 const TABS: { key: TabKey; icon: string; label: string }[] = [
   { key: 'focus', icon: '🌱', label: 'Fokus' },
   { key: 'stats', icon: '📊', label: 'Statistik' },
   { key: 'collection', icon: '🌳', label: 'Koleksi' },
+  { key: 'achievements', icon: '🏆', label: 'Prestasi' },
 ];
 
 // Menu melayang di bawah layar.
@@ -53,9 +54,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
-    paddingHorizontal: 18,
+    paddingHorizontal: 10,
     borderRadius: 28,
-    minWidth: 84,
+    minWidth: 72,
   },
   tabOn: { backgroundColor: '#43a047' },
   icon: { fontSize: 20 },
