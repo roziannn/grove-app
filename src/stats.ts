@@ -78,6 +78,20 @@ export function bucketMinutes(grown: Session[], range: Range, period: Period): B
   return { values, labels };
 }
 
+// Jenis pohon yang paling sering ditanam (hanya pohon yang tumbuh), terbanyak lebih dulu.
+// Sesi lama tanpa data jenis dianggap "oak" (Pohon Hijau). Jumlah sama: yang paling baru ditanam di atas.
+export function speciesRanking(grown: Session[]): { id: string; count: number }[] {
+  const map = new Map<string, { count: number; last: number }>();
+  for (const s of grown) {
+    const id = s.species ?? 'oak';
+    const cur = map.get(id) ?? { count: 0, last: 0 };
+    map.set(id, { count: cur.count + 1, last: Math.max(cur.last, s.date) });
+  }
+  return [...map.entries()]
+    .sort((a, b) => b[1].count - a[1].count || b[1].last - a[1].last)
+    .map(([id, v]) => ({ id, count: v.count }));
+}
+
 export function tagTotals(grown: Session[]): { tag: string; minutes: number }[] {
   const map = new Map<string, number>();
   for (const s of grown) {
