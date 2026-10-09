@@ -3,7 +3,7 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import Tree from '../Tree';
 import { Screen } from '../ui';
 import { BORDER, GREEN, GREEN_DARK, TEXT_SOFT } from '../theme';
-import { SPECIES } from '../species';
+import { SPECIES, glowColor } from '../species';
 import type { Profile } from '../storage';
 
 type Props = {
@@ -38,8 +38,15 @@ export default function CollectionScreen({ active, profile, coins, onChange }: P
           const owned = profile.unlocked.includes(sp.id);
           const selected = profile.selected === sp.id;
           return (
-            <View key={sp.id} style={[styles.item, selected && styles.itemOn]}>
-              <Tree progress={1} species={sp} size={88} />
+            <View
+              key={sp.id}
+              style={[
+                styles.item,
+                { backgroundColor: `${glowColor(sp)}26`, borderColor: `${glowColor(sp)}55` },
+                selected && [styles.itemOn, { borderColor: glowColor(sp), boxShadow: `0 0 16px 2px ${glowColor(sp)}99` }],
+              ]}
+            >
+              <Tree progress={1} species={sp} size={92} glow />
               <Text style={styles.name}>{sp.name}</Text>
               {owned ? (
                 <Pressable

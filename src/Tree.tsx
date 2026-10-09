@@ -1,6 +1,6 @@
-import React from 'react';
-import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
-import { DEFAULT_SPECIES, Head, Species } from './species';
+import React, { useId } from 'react';
+import Svg, { Circle, Defs, Ellipse, G, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
+import { DEFAULT_SPECIES, Head, Species, glowColor } from './species';
 import { DEFAULT_SEASON, Season } from './seasons';
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -341,6 +341,7 @@ export function TreeGraphic({ progress, withered = false, species = DEFAULT_SPEC
           <Circle cx={100 - 24 * crown} cy={top + 8 * crown} r={24 * crown} fill={mid} />
           <Circle cx={100 + 24 * crown} cy={top + 8 * crown} r={24 * crown} fill={mid} />
           <Circle cx={100 - 8 * crown} cy={top - 14 * crown} r={20 * crown} fill={light} />
+          {!withered && <Circle cx={92 - 6 * crown} cy={top - 20 * crown} r={9 * crown} fill="#ffffff" opacity={0.2} />}
         </>
       )}
 
@@ -373,7 +374,18 @@ export function TreeGraphic({ progress, withered = false, species = DEFAULT_SPEC
   );
 }
 
-type Props = GraphicProps & { size?: number; season?: Season };
+// Kilau kecil berbentuk bintang empat sudut.
+function Sparkle({ x, y, r, color }: { x: number; y: number; r: number; color: string }) {
+  const k = r * 0.3;
+  return (
+    <Path
+      d={`M${x} ${y - r} L${x + k} ${y - k} L${x + r} ${y} L${x + k} ${y + k} L${x} ${y + r} L${x - k} ${y + k} L${x - r} ${y} L${x - k} ${y - k} Z`}
+      fill={color}
+    />
+  );
+}
+
+type Props = GraphicProps & { size?: number; season?: Season; glow?: boolean };
 
 export default function Tree({
   progress,
@@ -381,13 +393,45 @@ export default function Tree({
   species = DEFAULT_SPECIES,
   size = 260,
   season = DEFAULT_SEASON,
+  glow = false,
 }: Props) {
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const color = glowColor(species);
+  // Cahaya ikut tumbuh bersama tanaman dan padam saat layu.
+  const strength = withered ? 0 : clamp(0.3 + 0.7 * progress);
+  const grown = !withered && progress >= 1;
+
   return (
     <Svg width={size} height={size} viewBox="0 0 200 200">
+      {glow && strength > 0 && (
+        <>
+          <Defs>
+            <RadialGradient id={`g${uid}`} cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor={color} stopOpacity={0.6 * strength} />
+              <Stop offset="0.55" stopColor={color} stopOpacity={0.22 * strength} />
+              <Stop offset="1" stopColor={color} stopOpacity={0} />
+            </RadialGradient>
+            <RadialGradient id={`w${uid}`} cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor="#ffffff" stopOpacity={0.55 * strength} />
+              <Stop offset="1" stopColor="#ffffff" stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={100} cy={104} r={98} fill={`url(#g${uid})`} />
+          <Circle cx={100} cy={112} r={58} fill={`url(#w${uid})`} />
+        </>
+      )}
       {/* tanah */}
       <Ellipse cx={100} cy={BASE_Y + 8} rx={62} ry={11} fill={withered ? '#8d7f6a' : season.sideL} />
       <Ellipse cx={100} cy={BASE_Y + 5} rx={56} ry={9} fill={withered ? '#a39577' : season.mound} />
       <TreeGraphic progress={progress} withered={withered} species={species} />
+      {glow && grown && (
+        <G opacity={0.9}>
+          <Sparkle x={42} y={62} r={5} color={color} />
+          <Sparkle x={160} y={46} r={4} color="#ffffff" />
+          <Sparkle x={152} y={118} r={3.4} color={color} />
+          <Sparkle x={56} y={128} r={3} color="#ffffff" />
+        </G>
+      )}
     </Svg>
   );
 }

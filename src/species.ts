@@ -14,6 +14,7 @@ export type Species = {
   center?: string; // warna inti bunga
   head?: Head; // bentuk kepala bunga (kind 'flower')
   dots?: string[]; // buah/bunga kecil di tajuk pohon (kind 'round')
+  glow?: string; // warna cahaya lembut; bawaan: warna bunga/daun
 };
 
 export const SPECIES: Species[] = [
@@ -35,7 +36,7 @@ export const SPECIES: Species[] = [
   },
   { id: 'maple', name: 'Maple', price: 80, kind: 'round', dark: '#e65100', mid: '#fb8c00', light: '#ffb74d', trunk: '#795548' },
   {
-    id: 'snowdrop', name: 'Snowdrop', price: 90, kind: 'flower', head: 'bell',
+    id: 'snowdrop', name: 'Snowdrop', price: 90, kind: 'flower', head: 'bell', glow: '#90caf9',
     dark: '#2e7d32', mid: '#66bb6a', light: '#a5d6a7', trunk: '#2e7d32', bloom: '#ffffff', center: '#aed581',
   },
   {
@@ -77,6 +78,10 @@ export const SPECIES: Species[] = [
 ];
 
 export const DEFAULT_SPECIES = SPECIES[0];
+
+// Warna cahaya lembut di belakang tanaman.
+export const glowColor = (sp: Species): string =>
+  sp.glow ?? (['round', 'cone', 'cactus'].includes(sp.kind) ? sp.light : (sp.bloom ?? sp.light));
 
 export const getSpecies = (id?: string): Species =>
   SPECIES.find((s) => s.id === id) ?? DEFAULT_SPECIES;
